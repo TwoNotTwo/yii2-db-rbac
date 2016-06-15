@@ -210,21 +210,19 @@ class AccessController extends Controller
         }
     }
 
-    protected function isUnique($name, $type)
+    protected function isUnique($name)
     {
-        if ($type == 'role') {
-            $role = Yii::$app->authManager->getRole($name);
-            if ($role instanceof Role) {
-                $this->error[] = Yii::t('db_rbac', 'Роль с таким именем уже существует') .':'. $name;
-                return false;
-            } else return true;
-        } elseif ($type == 'permission') {
-            $permission = Yii::$app->authManager->getPermission($name);
-            if ($permission instanceof Permission) {
-                $this->error[] = Yii::t('db_rbac', 'Разрешение с таким именем уже существует') .':'. $name;
-                return false;
-            } else return true;
+        $role = Yii::$app->authManager->getRole($name);
+        $permission = Yii::$app->authManager->getPermission($name);
+        if ($permission instanceof Permission){
+            $this->error[] = Yii::t('db_rbac', 'Разрешение с таким именем уже существует') .':'. $name;
+            return false;
         }
+        if ($role instanceof Role) {
+            $this->error[] = Yii::t('db_rbac', 'Роль с таким именем уже существует') .':'. $name;
+            return false;
+        }
+        return true;
     }
 
     protected function clear($value)

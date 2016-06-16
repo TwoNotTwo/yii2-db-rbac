@@ -42,7 +42,7 @@ class AccessController extends Controller
     {
         if (Yii::$app->request->post('name')
             && $this->validate(Yii::$app->request->post('name'), $this->pattern4Role)
-            && $this->isUnique(Yii::$app->request->post('name'), 'role')
+            && $this->isUnique(Yii::$app->request->post('name'))
         ) {
             $role = Yii::$app->authManager->createRole(Yii::$app->request->post('name'));
             $role->description = Yii::$app->request->post('description');
@@ -75,7 +75,7 @@ class AccessController extends Controller
             if (Yii::$app->request->post('name')
                 && $this->validate(Yii::$app->request->post('name'), $this->pattern4Role)
             ) {
-                if (Yii::$app->request->post('name') != $name && !$this->isUnique(Yii::$app->request->post('name'), 'role')) {
+                if (Yii::$app->request->post('name') != $name && !$this->isUnique(Yii::$app->request->post('name'))) {
                     return $this->render(
                         'updateRole',
                         [
@@ -131,7 +131,7 @@ class AccessController extends Controller
         $permission = $this->clear(Yii::$app->request->post('name'));
         if ($permission
             && $this->validate($permission, $this->pattern4Permission)
-            && $this->isUnique($permission, 'permission')
+            && $this->isUnique($permission)
         ) {
             $permit = Yii::$app->authManager->createPermission($permission);
             $permit->description = Yii::$app->request->post('description', '');
@@ -152,7 +152,7 @@ class AccessController extends Controller
             $permission = $this->clear(Yii::$app->request->post('name'));
             if ($permission && $this->validate($permission, $this->pattern4Permission)
             ) {
-                if($permission!= $name && !$this->isUnique($permission, 'permission'))
+                if($permission!= $name && !$this->isUnique($permission))
                 {
                     return $this->render('updatePermission', [
                         'permit' => $permit,

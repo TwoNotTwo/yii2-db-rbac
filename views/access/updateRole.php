@@ -1,8 +1,13 @@
 <?php
+/**
+ * @copyright Copyright (c) 2016 TwoNotTwo <2not2.github@gmail.com>
+ */
+
 namespace twonottwo\db_rbac\views\access;
 
 use Yii;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('db_rbac', 'Редактирование роли');
@@ -11,6 +16,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="permit-update-role">
     <h3><?= Html::encode($this->title. ': ' . $role->name) ?></h3>
+
+    <?php if (!empty($error)) { ?>
+        <div class="error-summary">
+            <?= implode('<br>', $error); ?>
+        </div>
+    <?php } ?>
 
     <div class="row">
         <div class="col-lg-5">
@@ -32,7 +43,18 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="form-group">
-                <?= Html::submitButton(Yii::t('db_rbac', 'Сохранить'), ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton(Yii::t('db_rbac', 'Обновить'), ['class' => 'btn btn-success']) ?>
+
+                <?=
+                Html::a(Yii::t('db_rbac', 'Удалить'), Url::toRoute(['delete-role','name' => $role->name]),
+                    [
+                        'class' => 'btn btn-danger',
+                        'data-confirm' => Yii::t('db_rbac', 'Удалить роль').': '.$role->name.' ?',
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ]
+                );
+                ?>
             </div>
 
             <?php ActiveForm::end(); ?>

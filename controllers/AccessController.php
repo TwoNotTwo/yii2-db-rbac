@@ -10,13 +10,15 @@
 namespace twonottwo\db_rbac\controllers;
 
 use Yii;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\BadRequestHttpException;
-use yii\rbac\Role;
-use yii\rbac\Permission;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\validators\RegularExpressionValidator;
+use yii\rbac\Role;
+use yii\rbac\Permission;
+
 
 class AccessController extends Controller
 {
@@ -33,6 +35,21 @@ class AccessController extends Controller
         ];
     }
 
+    /**
+     * просмотр разрешений у роли.
+     * имя роли, разрешения которой нужно вывести берется из URL, параметр name.
+     * для повышения безопастности доступ пользователей к данному действию должен быть ограничен
+     */
+    public function actionViewRole()
+    {
+        if (Yii::$app->request->get('name')) {
+            $role = Yii::$app->request->get('name');
+
+            return $this->render('viewRole', [ 'role' => Html::encode($role), ]);
+
+        } else throw new BadRequestHttpException(Yii::t('yii', 'Page not found.'));
+    }
+
     public function actionRole()
     {
         return $this->render('role');
@@ -43,41 +60,32 @@ class AccessController extends Controller
         if (Yii::$app->request->post('name')
             && $this->validate(Yii::$app->request->post('name'), $this->pattern4Role)
             && $this->isUnique(Yii::$app->request->post('name'))
-        ) {
-            $role = Yii::$app->authManager->createRole(Yii::$app->request->post('name'));
-            $role->description = Yii::$app->request->post('description');
+        ){
+            $role = Yii::$app->authManager->createRole(Html::encode(Yii::$app->request->post('name')));
+            $role->description = Html::encode(Yii::$app->request->post('description'));
             Yii::$app->authManager->add($role);
             $this->setPermissions(Yii::$app->request->post('permissions', []), $role);
-            return $this->redirect(Url::toRoute([
-                'update-role',
-                'name' => $role->name
-            ]));
+
+            return $this->redirect(Url::toRoute([ 'update-role', 'name' => $role->name ]));
         }
 
         $permissions = ArrayHelper::map(Yii::$app->authManager->getPermissions(), 'name', 'description');
-        return $this->render(
-            'addRole',
-            [
-                'permissions' => $permissions,
-                'error' => $this->error
-            ]
-        );
+
+        return $this->render('addRole', [ 'permissions' => $permissions, 'error' => $this->error ]);
     }
 
     public function actionUpdateRole($name)
     {
         $role = Yii::$app->authManager->getRole($name);
-
         $permissions = ArrayHelper::map(Yii::$app->authManager->getPermissions(), 'name', 'description');
         $role_permit = array_keys(Yii::$app->authManager->getPermissionsByRole($name));
 
         if ($role instanceof Role) {
             if (Yii::$app->request->post('name')
                 && $this->validate(Yii::$app->request->post('name'), $this->pattern4Role)
-            ) {
-                if (Yii::$app->request->post('name') != $name && !$this->isUnique(Yii::$app->request->post('name'))) {
-                    return $this->render(
-                        'updateRole',
+            ){
+                if (Html::encode(Yii::$app->request->post('name')) != $name && !$this->isUnique(Html::encode(Yii::$app->request->post('name')))) {
+                    return $this->render('updateRole',
                         [
                             'role' => $role,
                             'permissions' => $permissions,
@@ -86,18 +94,16 @@ class AccessController extends Controller
                         ]
                     );
                 }
+
                 $role = $this->setAttribute($role, Yii::$app->request->post());
                 Yii::$app->authManager->update($name, $role);
                 Yii::$app->authManager->removeChildren($role);
                 $this->setPermissions(Yii::$app->request->post('permissions', []), $role);
-                return $this->redirect(Url::toRoute([
-                    'update-role',
-                    'name' => $role->name
-                ]));
+
+                return $this->redirect(Url::toRoute([ 'update-role', 'name' => $role->name ]));
             }
 
-            return $this->render(
-                'updateRole',
+            return $this->render('updateRole',
                 [
                     'role' => $role,
                     'permissions' => $permissions,
@@ -105,9 +111,7 @@ class AccessController extends Controller
                     'error' => $this->error
                 ]
             );
-        } else {
-            throw new BadRequestHttpException(Yii::t('yii', 'Page not found.'));
-        }
+        } else throw new BadRequestHttpException(Yii::t('yii', 'Page not found.'));
     }
 
     public function actionDeleteRole($name)
@@ -117,7 +121,8 @@ class AccessController extends Controller
             Yii::$app->authManager->removeChildren($role);
             Yii::$app->authManager->remove($role);
         }
-        return $this->redirect(Url::toRoute(['role']));
+
+        return $this->redirect(Url::toRoute([ 'role' ]));
     }
 
 
@@ -128,66 +133,62 @@ class AccessController extends Controller
 
     public function actionAddPermission()
     {
-        $permission = $this->clear(Yii::$app->request->post('name'));
+        $permission = $this->clear(Html::encode(Yii::$app->request->post('name')));
         if ($permission
             && $this->validate($permission, $this->pattern4Permission)
             && $this->isUnique($permission)
-        ) {
+        ){
             $permit = Yii::$app->authManager->createPermission($permission);
-            $permit->description = Yii::$app->request->post('description', '');
+            $permit->description = Html::encode(Yii::$app->request->post('description', ''));
             Yii::$app->authManager->add($permit);
-            return $this->redirect(Url::toRoute([
-                'update-permission',
-                'name' => $permit->name
-            ]));
+
+            return $this->redirect(Url::toRoute([ 'update-permission', 'name' => $permit->name ]));
         }
 
-        return $this->render('addPermission', ['error' => $this->error]);
+        return $this->render('addPermission', [ 'error' => $this->error ]);
     }
 
     public function actionUpdatePermission($name)
     {
         $permit = Yii::$app->authManager->getPermission($name);
         if ($permit instanceof Permission) {
-            $permission = $this->clear(Yii::$app->request->post('name'));
-            if ($permission && $this->validate($permission, $this->pattern4Permission)
-            ) {
-                if($permission!= $name && !$this->isUnique($permission))
-                {
-                    return $this->render('updatePermission', [
-                        'permit' => $permit,
-                        'error' => $this->error
-                    ]);
+            $permission = $this->clear(Html::encode(Yii::$app->request->post('name')));
+            if ($permission && $this->validate($permission, $this->pattern4Permission)) {
+                if ($permission!= $name && !$this->isUnique($permission)) {
+                    return $this->render('updatePermission',
+                        [
+                            'permission' => $permit,
+                            'error' => $this->error
+                        ]
+                    );
                 }
 
                 $permit->name = $permission;
-                $permit->description = Yii::$app->request->post('description', '');
+                $permit->description = Html::encode(Yii::$app->request->post('description', ''));
                 Yii::$app->authManager->update($name, $permit);
-                return $this->redirect(Url::toRoute([
-                    'update-permission',
-                    'name' => $permit->name
-                ]));
+
+                return $this->redirect(Url::toRoute([ 'update-permission', 'name' => $permit->name ]));
             }
 
-            return $this->render('updatePermission', [
-                'permit' => $permit,
-                'error' => $this->error
-            ]);
+            return $this->render('updatePermission', [ 'permission' => $permit, 'error' => $this->error ]);
+
         } else throw new BadRequestHttpException(Yii::t('yii', 'Page not found.'));
     }
 
     public function actionDeletePermission($name)
     {
         $permit = Yii::$app->authManager->getPermission($name);
-        if ($permit)
+        if ($permit) {
             Yii::$app->authManager->remove($permit);
-        return $this->redirect(Url::toRoute(['permission']));
+        }
+        return $this->redirect(Url::toRoute([ 'permission' ]));
     }
 
     protected function setAttribute($object, $data)
     {
         $object->name = $data['name'];
         $object->description = $data['description'];
+
         return $object;
     }
 
@@ -201,10 +202,10 @@ class AccessController extends Controller
 
     protected function validate($field, $regex)
     {
-        $validator = new RegularExpressionValidator(['pattern' => $regex]);
-        if ($validator->validate($field, $error))
+        $validator = new RegularExpressionValidator([ 'pattern' => $regex ]);
+        if ($validator->validate($field, $error)) {
             return true;
-        else {
+        } else {
             $this->error[] = Yii::t('db_rbac', 'Значение "{field}" содержит не допустимые символы', ['field' => $field]);
             return false;
         }
@@ -214,7 +215,7 @@ class AccessController extends Controller
     {
         $role = Yii::$app->authManager->getRole($name);
         $permission = Yii::$app->authManager->getPermission($name);
-        if ($permission instanceof Permission){
+        if ($permission instanceof Permission) {
             $this->error[] = Yii::t('db_rbac', 'Разрешение с таким именем уже существует') .':'. $name;
             return false;
         }
@@ -230,7 +231,6 @@ class AccessController extends Controller
         if (!empty($value)) {
             $value = trim($value, "/ \t\n\r\0\x0B");
         }
-
         return $value;
     }
 }

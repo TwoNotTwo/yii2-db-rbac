@@ -13,16 +13,14 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\di\Instance;
 use yii\base\Module;
-use yii\web\Application;
 use yii\web\User;
-use yii\filters\AccessControl;
 use yii\web\ForbiddenHttpException;
 
 class AccessBehavior extends AttributeBehavior {
 
     public $rules=[];
-
     private $_rules = [];
+    public $routers = [];
 
     public function events()
     {
@@ -53,11 +51,16 @@ class AccessBehavior extends AttributeBehavior {
         if(!$this->cheсkByRule($action, $user, $request)) {
             //проверка прав доступа по записям в БД
             if (!$this->checkPermission($route)) {
-                if ($user->getIsGuest()) {
-                    $user->loginRequired();
-                } else {
-                    throw new ForbiddenHttpException(Yii::t('db_rbac', 'Недостаточно прав'));
-                }
+
+                //if (!$this->checkRoute($route)) {
+
+                    if ($user->getIsGuest()) {
+                        $user->loginRequired();
+                    } else {
+                        throw new ForbiddenHttpException(Yii::t('db_rbac', 'Недостаточно прав'));
+                    }
+
+               // }
             }
         }
     }
@@ -67,8 +70,7 @@ class AccessBehavior extends AttributeBehavior {
      */
     protected function createRule()
     {
-        foreach($this->rules as $controller => $rule)
-        {
+        foreach($this->rules as $controller => $rule) {
             foreach ($rule as $singleRule) {
                 if (is_array($singleRule)) {
                     $option = [
@@ -92,7 +94,6 @@ class AccessBehavior extends AttributeBehavior {
 
     protected function checkPermission($route)
     {
-
         //$route[0] - is the route, $route[1] - is the associated parameters
 
         $routePathTmp = explode('/', $route[0]);
@@ -112,9 +113,32 @@ class AccessBehavior extends AttributeBehavior {
             $routeVariant = $routeApp.'/'.$routeVariant;
             if(Yii::$app->user->can($routeVariant, $route[1]))
                 return true;
-
         }
-
         return false;
     }
+
+    /**
+     * заготовка функции для переадресации пользователя на указанную в настройцках (main.php) страницу, если
+     * у пользователя недостаточно прав для выполнения заданного действия
+     *
+     */
+    /*
+    protected function checkRoute($route){
+        $routePathTmp = explode('/', $route[0]);
+        $routeVariant = array_shift($routePathTmp);
+        $routeApp = explode('/', $route[2]);
+        $routeApp = $routeApp[0];
+        if (isset($this->routers[$routeVariant])) {
+            foreach ($this->routers[$routeVariant] as $action) {
+                if ($action['actions'][0] == $routePathTmp[0]) {
+                    Yii::$app->response->redirect($action['route'])->send();
+                    exit();
+                }
+            }
+        } else {
+            echo 'no idea';
+        }
+        return false;
+    }
+    */
 }

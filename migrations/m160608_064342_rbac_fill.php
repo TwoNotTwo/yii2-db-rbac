@@ -1,6 +1,9 @@
 <?php
 /**
- * @copyright Copyright (c) 2016 Kirill Ganenko
+ * @copyright Copyright (c) 2016 TwoNotTwo <2not2.github@gmail.com>
+ *
+ * миграция добавит начальные разрешения, роль для пользователя с id 1
+ * подразумевается, что учетная запись администратора имеет ID 1
  */
 use yii\db\Migration;
 use yii\base\InvalidConfigException;
@@ -27,5 +30,7 @@ class m160608_064342_rbac_fill extends Migration
         $this->execute("INSERT INTO {$authManager->itemTable} (`name`, `type`, `description`, `rule_name`, `data`, `created_at`, `updated_at`) VALUES ('root', '1', 'Суперпользователь', null, null, '$_at', '$_at'), ('permit', '2', 'Настройка прав доступа', null, null, $_at, $_at), ('adminpanel', '2', 'Админпанель', null, null, $_at, $_at)");
         $this->execute("INSERT INTO {$authManager->assignmentTable} (`item_name`, `user_id`, `created_at`) VALUES ('root', '1', $_at)");
         $this->execute("INSERT INTO {$authManager->itemChildTable} (`parent`, `child`) VALUES ('root', 'permit'), ('root', 'adminpanel')");
+
+
     }
 }

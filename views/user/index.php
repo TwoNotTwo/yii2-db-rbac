@@ -4,6 +4,7 @@
  */
 namespace twonottwo\db_rbac\views\user;
 
+use common\models\User;
 use Yii;
 use yii\grid\GridView;
 use yii\grid\ActionColumn;
@@ -46,7 +47,23 @@ echo GridView::widget([
         [
             'label' => Yii::t('db_rbac', 'Роль'),
             'format' => ['html'],
-            'value' => function($model) { return implode('<br>',array_keys(ArrayHelper::map(Yii::$app->authManager->getRolesByUser($model->id), 'description', 'description')));}
+            'value' => function($model) {
+                $role = ArrayHelper::map(Yii::$app->authManager->getRolesByUser($model->id), 'name', 'description');
+                $roleList = '';
+
+                foreach ($role as $key => $value){
+                    $roleList .= (strlen($value)) > 0 ? $value : $key;
+                    $roleList .= '<br>';
+                }
+
+                return $roleList;
+
+            }
+        ],
+
+        [
+            'label' => Yii::t('db_rbac' , 'Статус'),
+            'value' => function($model) {return User::getStatusName($model->status); }
         ],
 
         [

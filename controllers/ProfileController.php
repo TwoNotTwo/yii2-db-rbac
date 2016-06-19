@@ -24,6 +24,7 @@ class ProfileController extends Controller
             $user = User::findIdentity($model->user_id);
             $param = Yii::$app->request->post('User');
             $user->email = $param['email'];
+            $user->username = $param['username'];
             $user->save();
             return $this->redirect(Url::to(["/".Yii::$app->controller->module->id."/user/view", 'id' => $model->user_id]));
         } else {

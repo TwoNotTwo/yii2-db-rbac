@@ -10,6 +10,7 @@
 
 namespace twonottwo\db_rbac\views\user;
 
+use common\models\User;
 use Yii;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -22,12 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="row">
-    <div class="col-lg-5">
-        <h4><?= Yii::t('db_rbac', 'Личные данные пользователя'); ?></h4>
+    <div class="col-lg-4">
+        <h4><?= Yii::t('db_rbac', 'Личные данные пользователя');  ?></h4>
 
         <?php $form = ActiveForm::begin(['action' => ["/{$moduleName}/profile/update", 'id' => $profile->getId()]]); ?>
         <?= $form->field($profile, 'p_username')->textInput(['autocomplete' => 'off']); ?>
         <?= $form->field($profile, 'birthday')->textInput(['autocomplete' => 'off']);?>
+        <?= $form->field($user, 'username')->textInput(['autocomplete' => 'off']); ?>
         <?= $form->field($user, 'email')->textInput(['autocomplete' => 'off']);?>
 
         <div class="form-group">
@@ -38,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </div>
 
-    <div class="col-lg-7">
+    <div class="col-lg-4">
         <h4><?= Yii::t('db_rbac', 'Назначение ролей'); ?></h4>
 
         <?php $form = ActiveForm::begin(['action' => ["/{$moduleName}/user/update", 'id' => $user->getId()]]); ?>
@@ -60,6 +62,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 'separator' => '<br>',
             ]);
         ?>
+
+        <div class="form-group">
+            <?= Html::submitButton(Yii::t('db_rbac', 'Назначить'), ['class' => 'btn btn-primary']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
+    </div>
+
+    <div class="col-lg-4">
+        <h4><?= Yii::t('db_rbac', 'Статус учетной записи'); ?></h4>
+        <?php $form = ActiveForm::begin(['action' =>  ["/{$moduleName}/user/update-status", 'id' => $user->getId()]]); ?>
+        <?= Html::radioList('status', $user->status, $user_status, [ 'separator' => '<br>', ]); ?>
 
         <div class="form-group">
             <?= Html::submitButton(Yii::t('db_rbac', 'Назначить'), ['class' => 'btn btn-primary']) ?>

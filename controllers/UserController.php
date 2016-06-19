@@ -9,6 +9,7 @@
  */
 namespace twonottwo\db_rbac\controllers;
 
+use common\models\User;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -56,6 +57,7 @@ class UserController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'update' => ['post'],
+                    'update-status' => ['post'],
                     '*' => ['get'],
                 ],
             ],
@@ -88,6 +90,11 @@ class UserController extends Controller
                 'user' => $user,
                 'roles' => $roles,
                 'user_permit' => $user_permit,
+                'user_status' => [
+                    User::STATUS_DELETED => Yii::t('db_rbac', 'Удалена'),
+                    User::STATUS_BAN => Yii::t('db_rbac', 'Заблокирована'),
+                    User::STATUS_ACTIVE => Yii::t('db_rbac', 'Активна'),
+                ],
                 'moduleName' => Yii::$app->controller->module->id,
                 'profile' => $profile,
             ]
@@ -107,6 +114,19 @@ class UserController extends Controller
         }
         return $this->redirect(Url::to([ "/".Yii::$app->controller->module->id."/user/view", 'id' => $user->getId() ]));
     }
+
+    public function actionUpdateStatus($id){
+        $id = Html::encode($id);
+        $user = $this->findUser($id);
+
+        if (Yii::$app->request->post('status')) {
+            $user->status = Yii::$app->request->post('status');
+            if ($user->save()) {
+                return $this->redirect(Url::to(["/" . Yii::$app->controller->module->id . "/user/view", 'id' => $id]));
+            } else throw new NotFoundHttpException(Yii::t('db_rbac', 'Пользователь не найден'));
+        }
+    }
+
 
     private function findUser($id)
     {

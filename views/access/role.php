@@ -48,7 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'class' => ActionColumn::className(),
                 'template' => '{update}',
-                //'template' => '{update}&nbsp;&nbsp;&nbsp;{delete}',
                 'contentOptions' => ['width' => '23pt'],
                 'buttons' => [
                     'update' => function ($url, $model) {
@@ -57,16 +56,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'data-pjax' => '0',
                         ]);
                     },
-                    /*
-                    'delete' => function ($url, $model) {
-                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::toRoute(['delete-role','name' => $model->name]), [
-                                'title' => Yii::t('yii', 'Delete'),
-                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
-                                'data-method' => 'post',
-                                'data-pjax' => '0',
-                        ]);
-                    }
-                    */
                 ]
             ],
         ]

@@ -15,7 +15,10 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('db_rbac', 'Разрешен
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="permit-update-permission">
-    <h3><?= Html::encode($this->title. ': ' . $permission->description) ?></h3>
+    <h3>
+        <?php $title = (strlen($permission->description) <= 0) ? $permission->name : $permission->description; ?>
+        <?= Html::encode($this->title. ': ' . $title); ?>
+    </h3>
 
     <?php if (!empty($error)) { ?>
         <div class="error-summary">
@@ -29,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Название разрешения')); ?>
-                <?= Html::textInput('name', $permission->name, ['class' => 'form-control']); ?>
+                <?= Html::textInput('name', $permission->name, ['class' => 'form-control', 'autocomplete' => 'off']); ?>
                 <div style="color:#999; font-size:0.9em">
                     <?= Yii::t('db_rbac', 'Формат записи: app-name/module/controller/action'); ?>
                 </div>
@@ -37,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Описание')); ?>
-                <?= Html::textInput('description', $permission->description, ['class' => 'form-control']); ?>
+                <?= Html::textInput('description', $permission->description, ['class' => 'form-control', 'autocomplete' => 'off']); ?>
             </div>
 
 

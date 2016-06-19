@@ -11,17 +11,19 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = Yii::t('db_rbac', 'Разрешения роли');
-$roleName = Yii::$app->authManager->getRole($role)->description;
+$model = Yii::$app->authManager->getRole($role);
+$roleName = ($model->description) >0 ? $model->description : $model->name;
 ?>
 
 <h3 class="text-center"><?= $roleName ?></h3>
 
 <div class="row text-center">
     <?php
-        $permissions = ArrayHelper::map(Yii::$app->authManager->getPermissionsByRole($role), 'description', 'description');
-        if ($permissions) {
-            echo implode('<br>',array_keys($permissions));
-        } else echo Yii::t('db_rbac', 'Этой роли еще не присвоены разрешения');
+        $permissions = ArrayHelper::map(Yii::$app->authManager->getPermissionsByRole($role), 'name', 'description');
+        foreach ($permissions as $key => $value){
+            echo (strlen($value)) > 0 ? $value : $key;
+            echo '<br>';
+        }
     ?>
 </div>
 

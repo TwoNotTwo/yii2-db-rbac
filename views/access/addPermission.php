@@ -27,8 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-lg-5">
             <?php ActiveForm::begin([ 'id' => 'add-permission-form']); ?>
             <div class="form-group">
-                <?= Html::label(Yii::t('db_rbac', 'Название разрешения',['class' => 'form-control '])); ?>
-                <?= Html::textInput('name', '', ['class' => 'form-control']);  ?>
+                <?= Html::label(Yii::t('db_rbac', 'Название разрешения',['class' => 'form-control'])); ?>
+                <?= Html::textInput('name', '', ['class' => 'form-control', 'autocomplete' => 'off']);  ?>
                 <div style="color:#999; font-size:0.9em">
                     <?= Yii::t('db_rbac', 'Формат записи: app-name/module/controller/action'); ?>
                 </div>
@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Описание', ['class' => 'form-control'])); ?>
-                <?= Html::textInput('description', '', ['class' => 'form-control']); ?>
+                <?= Html::textInput('description', '', ['class' => 'form-control', 'autocomplete' => 'off']); ?>
             </div>
 
             <div class="form-group">

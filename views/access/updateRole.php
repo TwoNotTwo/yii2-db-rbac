@@ -15,7 +15,11 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('db_rbac', 'Роли'), 'url
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="permit-update-role">
-    <h3><?= Html::encode($this->title. ': ' . $role->name) ?></h3>
+    <h3>
+        <?php $title = (strlen($role->description) <= 0) ? $role->name : $role->description; ?>
+        <?= Html::encode($this->title. ': ' . $title); ?>
+
+    </h3>
 
     <?php if (!empty($error)) { ?>
         <div class="error-summary">
@@ -29,17 +33,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Название роли')); ?>
-                <?= Html::textInput('name', $role->name, ['class' => 'form-control']); ?>
+                <?= Html::textInput('name', $role->name, ['class' => 'form-control', 'autocomplete' => 'off']); ?>
             </div>
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Описание')); ?>
-                <?= Html::textInput('description', $role->description, ['class' => 'form-control']); ?>
+                <?= Html::textInput('description', $role->description, ['class' => 'form-control', 'autocomplete' => 'off']); ?>
             </div>
 
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Есть доступ к')); ?>
-                <?= Html::checkboxList('permissions', $role_permit, $permissions, ['separator' => '<br>']); ?>
+                <?= Html::checkboxList('permissions', $role_permit, $permissions, [
+                        'item' => function ($index, $label, $name, $checked, $value){
+                            (strlen($label) <= 0) ? $label = $value : false;
+                            return Html::checkbox($name, $checked, [
+                                'value' => Html::encode($value),
+                                'label' => '<label for="' . Html::encode($value) . '">' .  Html::encode($label) . '</label>',
+                            ]);
+                        },
+                        'separator' => '<br>',
+                        ]
+                    );
+                ?>
             </div>
 
             <div class="form-group">

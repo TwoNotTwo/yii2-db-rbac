@@ -26,41 +26,38 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-lg-5">
             <?php ActiveForm::begin(['id' => 'add-role-form']); ?>
-
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Название роли')); ?>
-                <?= Html::textInput('name', '', ['class' => 'form-control', 'autocomplete' => 'off']); ?>
+                <?= Html::textInput('name', '', ['class' => 'form-control', 'autofocus' => true, 'autocomplete' => 'off']); ?>
                 <div style="color:#999; font-size:0.9em">
                     <?= Yii::t('db_rbac', 'Использовать можно: латинские буквы, цифры,"_" и "-"'); ?>
                 </div>
             </div>
-
             <div class="form-group">
                 <?= Html::label(Yii::t('db_rbac', 'Описание')); ?>
                 <?= Html::textInput('description', '', ['class' => 'form-control', 'autocomplete' => 'off']); ?>
             </div>
-
-            <div class="form-group">
-                <?= Html::label(Yii::t('db_rbac', 'Есть доступ к')); ?>
-                <?= Html::checkboxList('permissions', null, $permissions, [
-                            'item' => function ($index, $label, $name, $checked, $value){
-                                (strlen($label) <= 0) ? $label = $value : false;
-                                return Html::checkbox($name, $checked, [
-                                    'value' => Html::encode($value),
-                                    'label' => '<label for="' . Html::encode($value) . '">' .  Html::encode($label) . '</label>',
-                                ]);
-                            },
-                            'separator' => '<br>',
-                        ]
-                    );
-                ?>
-            </div>
-
-            <div class="form-group">
-                <?= Html::submitButton(Yii::t('db_rbac', 'Сохранить'), ['class' => 'btn btn-success']) ?>
-            </div>
-
-            <?php ActiveForm::end(); ?>
         </div>
+
+        <div class="col-lg-4">
+            <?= Html::label(Yii::t('db_rbac', 'Есть доступ к')); ?>
+            <?= Html::checkboxList('permissions', null, $permissions, [
+                        'item' => function ($index, $label, $name, $checked, $value){
+                            (strlen($label) <= 0) ? $label = $value : false;
+                            return Html::checkbox($name, $checked, [
+                                'value' => Html::encode($value),
+                                'label' => '<label for="' . Html::encode($value) . '">' .  Html::encode($label) . '</label>',
+                            ]);
+                        },
+                        'separator' => '<br>',
+                    ]
+                );
+            ?>
+        </div>
+
+        <div class="col-lg-3">
+            <?= Html::submitButton(Yii::t('db_rbac', 'Сохранить'), ['class' => 'btn btn-success']) ?>
+        </div>
+        <?php ActiveForm::end(); ?>
     </div>
 </div>
